@@ -44,3 +44,5 @@ df['Genero'] = df['Genero'].replace({
 df['Servico_Internet'] = df['Servico_Internet'].replace({
     'dsl': 'DSL',
 })
+
+df.to_csv("telecon_limpo.csv", index=False)
