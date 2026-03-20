@@ -3,6 +3,8 @@ import matplotlib.pyplot as plt
 import pandas as pd
 import plotly.express as px
 import numpy as np
+from sklearn.model_selection import train_test_split
+from imblearn.over_sampling import SMOTE
 
 #df = pd.read_csv("credit_score.csv", delimiter=';') income é str, precisa ser float64
 df = pd.read_csv('credit_score.csv', sep=';', decimal=',', thousands='.') #lê números "brasileiros" como numeros, income é float
@@ -153,3 +155,32 @@ Marital Status_Single e Home Ownership_Rented, correlação positiva moderada, p
 Income e Home Ownership_Rented, correlação negativa considerável, pessoas com rendas maiores têm menos probabilidade de morar em casas alugadas
 Age e Marital Status_Single, correlação negativa moderada, idade aumenta, a probabilidade de a pessoa ser solteira diminui'''
 
+#alvo é pontuação de crédito
+X = df_encoded.drop(columns=['Credit Score_High'])  # ajuste conforme seu target
+y = df_encoded['Credit Score_High']
+
+#base dividida em conjuntos de treino (80%) e teste (20%)
+X_train, X_test, y_train, y_test = train_test_split(
+    X, y, test_size=0.2, random_state=42
+)
+
+print("X_train:", X_train.shape)
+print("X_test:", X_test.shape)
+print("y_train:", y_train.shape)
+print("y_test:", y_test.shape)
+
+sns.countplot(x=y_train)
+plt.title("Distribuição da pontuação de crédito(treino)")
+plt.xlabel("Credit Score Alto")
+plt.ylabel("Quantidade")
+plt.show()
+#desbalanceamento, com muito mais clientes de credit score alto
+#pode enviesar o modelo dificultando identificar corretamente clientes com score mais baixo
+
+smote = SMOTE(random_state=42)
+X_train_bal, y_train_bal = smote.fit_resample(X_train, y_train)
+
+# Verificar balanceamento
+print(y_train.value_counts())
+print("\nDepois do SMOTE:\n")
+print(y_train_bal.value_counts())
